@@ -5,19 +5,20 @@
 #include <map>
 
 struct BinaryTree {
-	BinaryTree() : LeftBranch(NULL), RightBranch(NULL) {
+	BinaryTree() : LeftBranch(NULL), RightBranch(NULL), code("0") {
 		item.first = '*';
 		item.second = 0;
 	}
 	std::pair<char, int> item;
+	std::string code;
 	BinaryTree *LeftBranch;
 	BinaryTree *RightBranch;
 };
 
 class Huff {
 public:
-	Huff() { string = ""; }
-	Huff(std::string str) : string(str) {}
+	Huff() { string = "";}
+	Huff(std::string str_in) : string(str_in) {}
 	~Huff() {}
 	void Print_str() {
 		std::cout << string << std::endl;
@@ -33,6 +34,7 @@ public:
 			i = new BinaryTree;
 			*i = ExtractMin(H);
 			temp.item.second = i->item.second;
+			temp.code = "";
 			temp.LeftBranch = i;
 			H.push_back(temp);
 		}
@@ -44,12 +46,14 @@ public:
 				*i = ExtractMin(H);
 				*j = ExtractMin(H);
 				temp.item.second = i->item.second + j->item.second;
+				temp.code = "";
 				temp.LeftBranch = i;
 				temp.RightBranch = j;
 				H.push_back(temp);
 			}
 		}
-		MakeTable(&H[0]);
+		MakeCode(&H[0]);
+		//MakeTable(&H[0]);
 		std::cout << m.size() << " " << size_encode() << std::endl;
 		print_table();
 		encode();
@@ -96,14 +100,60 @@ private:
 		}
 		return ch;
 	}
+	void MakeCode(BinaryTree *Tree)
+	{
+		if (Tree->LeftBranch) {
+			Tree->LeftBranch->code = Tree->code;
+			Tree->LeftBranch->code += "0";
+			MakeCode(Tree->LeftBranch);
+		}
+		if (Tree->RightBranch) {
+			Tree->RightBranch->code = Tree->code;
+			Tree->RightBranch->code += "1";
+			MakeCode(Tree->RightBranch);
+		}
+		if (Tree->RightBranch == NULL && Tree->LeftBranch == NULL) {
+			m[Tree->item.first] = Tree->code;
+		}
+	}
 
+	/*
+	void WriteTree(BinaryTree *pNode)
+	{
+		if (pNode->LeftBranch)
+		{
+			str += '1';
+			WriteTree(pNode->LeftBranch);
+		}
+		else  str += '0';
 
+		if (pNode->RightBranch)
+		{
+			str += '1';
+			WriteTree(pNode->RightBranch);
+		}
+		else
+		{
+			str += '0';
+			if (!pNode->LeftBranch) {
+
+				m[pNode->item.first] = str;
+				str.clear();
+			}
+		}
+	}
+	*/
+	/*
 	void MakeTable(BinaryTree *Tree)
 	{
-		if (Tree->LeftBranch == NULL || Tree->RightBranch == NULL) {
+
+		if (Tree->LeftBranch == NULL && Tree->RightBranch == NULL) {
+			//std::reverse(str.begin(), str.end());
 			m[Tree->item.first] = str;
 			str.pop_back();
+			
 		}
+
 		if (Tree->LeftBranch != NULL) {
 			str += '0';
 			MakeTable(Tree->LeftBranch);
@@ -113,6 +163,7 @@ private:
 			MakeTable(Tree->RightBranch);
 		}
 	}
+	*/
 	void print_table() {
 		for (auto & i : m) {
 			std::cout << i.first << ": " << i.second << std::endl;
@@ -136,7 +187,6 @@ private:
 		std::cout << std::endl;
 	}
 
-	std::string str;
 	std::string string;
 	std::vector<BinaryTree> H;
 	std::map <char,std::string> m;
@@ -146,7 +196,17 @@ private:
 int main() {
 	std::string str;
 	std::cin >> str;
-	Huff huff(str);
-	huff.Huffman();
+	Huff huff0(str);
+	huff0.Huffman();
+	std::cout << std::endl;
+	Huff huff1("abacabad");
+	huff1.Huffman();
+	std::cout << std::endl;
+	Huff huff2("qwer");
+	huff2.Huffman();
+	std::cout << std::endl;
+	Huff huff3("qqqqwwwweeee");
+	huff3.Huffman();
+	std::cout << std::endl;
 	return 0;
 }
